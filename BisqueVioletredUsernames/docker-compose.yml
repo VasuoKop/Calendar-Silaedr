@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - database_data:/app/BisqueVioletredUsernames/database.db
+
+volumes:
+  database_data:
