@@ -1,0 +1,62 @@
+gitignore
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyd
+*.so
+
+# OS generated files
+.DS_Store
+thumbs.db
+
+# Editor directories and files
+.vscode/
+
+# Dependency management
+#
+# Note: dependencies must be added to requirements.txt
+# e.g. via poetry add packagename
+pip-wheel-metadata/
+.venv/
+env/
+.env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+wheels/
+*.egg-info/
+.poetry/
+.python-poetry/
+
+# Distribution / packaging
+.mpy
+.uloop
+build/
+dist/
+sdist/
+wheels/
+*.whl
+
+# Specific project files to ignore
+database.db
+docker-compose.yml
+generated-icon.png
+uv.lock
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pytest
+.pytest_cache/
+
+# coverage
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Additional ignores specific to the project
+BisqueVioletredUsernames/uv.lock

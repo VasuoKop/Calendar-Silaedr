@@ -154,15 +154,21 @@ def add_note():
 def get_notes(date):
     if 'user_id' not in session:
         return jsonify({'error': 'Not logged in'}), 401
-        
+
     date_obj = datetime.strptime(date, '%Y-%m-%d')
+    classification_filter = request.args.get('classification')
+
     with get_db() as db:
-        notes = db.query(Note).filter_by(date=date_obj).all()
+        query = db.query(Note).filter_by(date=date_obj)
+        if classification_filter:
+            query = query.join(Note.classifications).filter(Classification.name == classification_filter)
+
+        notes = query.all()
         result = []
         for note in notes:
             result.append({
                 'id': note.id,
-                'content': note.content,
+ 'content': note.content,
                 'user_id': note.user_id,
                 'classifications': [{'id': c.id, 'name': c.name} for c in note.classifications]
             })
@@ -176,9 +182,7 @@ def delete_classification(classification_id):
     with get_db() as db:
         classification = db.query(Classification).get(classification_id)
         if classification:
-            # Update notes with this classification to have no classification
-            notes = db.query(Note).filter_by(classification_id=classification_id).all()
-            for note in notes:
+ for note in classification.notes:
                 note.classification_id = None
             
             db.delete(classification)
@@ -280,3 +284,4 @@ if __name__ == '__main__':
             
             db.commit()
     app.run(host='0.0.0.0', port=8080)
+ else:

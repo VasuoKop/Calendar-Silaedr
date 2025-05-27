@@ -71,6 +71,18 @@
                         <div class="col-auto">
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
+                        <div class="col-auto">
+                            <select id="classificationFilter" class="form-select">
+                                <option value="">All Classifications</option>
+                                {% for classification in classifications %}
+                                <option value="{{ classification.id }}">{{ classification.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-outline-secondary" onclick="applyFilter()">Apply Filter</button>
+                        </div>
+
                     </div>
                 </form>
 
@@ -150,10 +162,12 @@
                 }
             };
             request.send();
-        }
+    }
 
         let selectedDate = null;
+        let currentClassificationFilter = null;
 
+    // Function to handle day clicks and display notes
         function handleDayClick(event) {
             let target = event.target;
             if (target.classList.contains('day-content')) {
@@ -174,6 +188,7 @@
                 }
 
                 loadNotes(selectedDate);
+                loadNotes(selectedDate, currentClassificationFilter);
 
                 const allCells = document.querySelectorAll('.calendar-table td');
                 allCells.forEach(cell => cell.classList.remove('selected-day'));
@@ -181,8 +196,13 @@
             }
         }
 
-        function loadNotes(date) {
-            fetch(`/notes/${date}`)
+    // Function to load notes for a specific date and optionally filter by classification
+        function loadNotes(date, classificationId = null) {
+            let url = `/notes/${date}`;
+            if (classificationId) {
+                url += `?classification_id=${classificationId}`;
+            }
+            fetch(url)
                 .then(response => response.json())
                 .then(notes => {
                     const notesDiv = document.getElementById('existingNotes');
@@ -210,6 +230,7 @@
                 });
         }
 
+    // Set to store selected classifications for saving a note
     let selectedClassifications = new Set();
 
     function loadClassifications() {
@@ -246,6 +267,7 @@
         loadClassifications();
     }
 
+    // Function to add a new classification
         function addClassification() {
             const name = document.getElementById('newClassification').value;
             if (!name.trim()) return;
@@ -266,6 +288,7 @@
             });
         }
 
+    // Function to save a note
         function saveNote() {
             const content = document.getElementById('noteContent').value;
             if (!content.trim()) return;
@@ -291,6 +314,7 @@
             });
         }
 
+    // Function to delete a note
         function deleteNote(noteId) {
             fetch(`/note/${noteId}`, {
                 method: 'DELETE'
@@ -304,6 +328,7 @@
             });
         }
 
+    // Function to delete a classification
         function deleteClassification(classificationId) {
             fetch(`/classification/${classificationId}`, {
                 method: 'DELETE'
@@ -316,6 +341,7 @@
             });
         }
 
+    // Function to toggle admin status (for admin users)
         function toggleAdminStatus(userId) {
             fetch(`/user/${userId}/toggle-admin`, {
                 method: 'POST'
@@ -330,11 +356,20 @@
             });
         }
 
+    // Function to apply classification filter
+        function applyFilter() {
+            currentClassificationFilter = document.getElementById('classificationFilter').value;
+            if (selectedDate) {
+                loadNotes(selectedDate, currentClassificationFilter);
+            }
+        }
+
+    // Initialize calendar and event listeners on page load
         window.onload = function() {
             updateCalendar(parseInt(document.querySelector('select[name="month"]').value));
             document.getElementById('calendar-table').addEventListener('click', handleDayClick);
-            loadClassifications();
-        };
+            loadClassifications(); // Load classifications when the page loads
+    };
     </script>
 </body>
 </html>
